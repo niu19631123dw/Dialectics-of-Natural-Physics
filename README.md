@@ -35,12 +35,22 @@
 
 ## About
 
-This book is an attempt to trace the fundamental logic of the physical world from first principles.
+**Volume I** covers the foundational pillars of classical physics:
 
-It begins with the simplest concepts of matter, motion, and interaction, builds a rigorous framework through analytical mechanics and classical field theory, and culminates in Noether's theorem — revealing that conservation laws are not mathematical accidents, but necessary consequences of the objective symmetries of the universe.
+- The concepts of matter, space, time, and interaction
+- Kinematics and Newtonian mechanics
+- Analytical mechanics: Lagrangian and Hamiltonian formalisms
+- Wave theory and geometric optics
+- Electrodynamics and Maxwell's equations
+- Thermodynamics and statistical mechanics
+- Noether's theorem and the relation between symmetry and conservation laws
 
-The journey does not stop there. **Volume II** will continue into relativity, quantum mechanics, dissipative structures, and ultimately the physical laws behind the emergence of life.
+**Volume II** is planned to continue into:
 
+- Special and general relativity
+- Quantum mechanics
+- Dissipative structures
+- Biophysics and the physical basis of life
 ---
 
 ## License
