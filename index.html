@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线阅读 - shangce</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #0f3460;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { color: #aaa; font-size: 14px; }
+        .controls {
+            background: #16213e;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            align-items: center;
+            border-bottom: 1px solid #0f3460;
+            flex-wrap: wrap;
+        }
+        .controls button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .controls button:hover { background: #c73e54; transform: translateY(-1px); }
+        .controls button:disabled { background: #555; cursor: not-allowed; transform: none; }
+        .page-info {
+            color: #ddd;
+            font-size: 15px;
+            min-width: 120px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .zoom-controls { display: flex; gap: 6px; align-items: center; }
+        .zoom-controls span { color: #aaa; font-size: 13px; min-width: 45px; text-align: center; }
+        .download-btn { background: #0f3460 !important; }
+        .download-btn:hover { background: #1a4a7a !important; }
+        #viewer {
+            display: flex;
+            justify-content: center;
+            padding: 25px 15px;
+            min-height: calc(100vh - 140px);
+        }
+        #canvas {
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            max-width: 100%;
+            background: white;
+        }
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: #aaa;
+        }
+        .loading::before {
+            content: "📖";
+            display: block;
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        .error {
+            text-align: center;
+            padding: 80px 20px;
+            color: #e94560;
+            max-width: 500px;
+        }
+        .error::before {
+            content: "⚠️";
+            display: block;
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .error a {
+            color: #4da6ff;
+            text-decoration: none;
+        }
+        .error a:hover { text-decoration: underline; }
+        @media (max-width: 600px) {
+            .controls { gap: 8px; padding: 10px; }
+            .controls button { padding: 6px 12px; font-size: 12px; }
+            .header h1 { font-size: 20px; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 shangce</h1>
+        <p>在线阅读 · 支持翻页、缩放、下载</p>
+    </div>
+    
+    <div class="controls">
+        <button onclick="prevPage()" id="prevBtn">← 上一页</button>
+        <span class="page-info">第 <span id="currentPage">-</span> / <span id="totalPages">-</span> 页</span>
+        <button onclick="nextPage()" id="nextBtn">下一页 →</button>
+        <div class="zoom-controls">
+            <button onclick="zoomOut()">−</button>
+            <span id="zoomLevel">100%</span>
+            <button onclick="zoomIn()">+</button>
+        </div>
+        <button onclick="downloadPDF()" class="download-btn">⬇ 下载</button>
+    </div>
+    
+    <div id="viewer">
+        <div class="loading">正在加载 PDF，请稍候...</div>
+    </div>
+
+    <script>
+        const PDF_URL = './shangce.pdf';
+        
+        let pdfDoc = null;
+        let currentPage = 1;
+        let totalPages = 0;
+        let scale = 1.3;
+        let canvas, ctx;
+
+        function init() {
+            canvas = document.createElement('canvas');
+            canvas.id = 'canvas';
+            ctx = canvas.getContext('2d');
+            document.getElementById('viewer').innerHTML = '';
+            document.getElementById('viewer').appendChild(canvas);
+            loadPDF();
+        }
+
+        async function loadPDF() {
+            try {
+                pdfDoc = await pdfjsLib.getDocument(PDF_URL).promise;
+                totalPages = pdfDoc.numPages;
+                document.getElementById('totalPages').textContent = totalPages;
+                renderPage(currentPage);
+            } catch (error) {
+                document.getElementById('viewer').innerHTML = 
+                    '<div class="error">无法加载 PDF<br><br>可能的原因：<br>1. 文件名不匹配（当前查找：shangce.pdf）<br>2. PDF 尚未上传到仓库根目录<br>3. 文件名大小写不一致<br><br>请检查仓库中的文件名，确保完全一致。<br><br>错误：' + error.message + '</div>';
+            }
+        }
+
+        async function renderPage(num) {
+            const page = await pdfDoc.getPage(num);
+            const viewport = page.getViewport({ scale: scale });
+            
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            await page.render({
+                canvasContext: ctx,
+                viewport: viewport
+            }).promise;
+            
+            document.getElementById('currentPage').textContent = num;
+            updateButtons();
+        }
+
+        function updateButtons() {
+            document.getElementById('prevBtn').disabled = currentPage <= 1;
+            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage(currentPage);
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderPage(currentPage);
+            }
+        }
+
+        function zoomIn() {
+            scale += 0.2;
+            updateZoomDisplay();
+            renderPage(currentPage);
+        }
+
+        function zoomOut() {
+            if (scale > 0.4) {
+                scale -= 0.2;
+                updateZoomDisplay();
+                renderPage(currentPage);
+            }
+        }
+
+        function updateZoomDisplay() {
+            document.getElementById('zoomLevel').textContent = Math.round(scale * 100 / 1.3) + '%';
+        }
+
+        function downloadPDF() {
+            const link = document.createElement('a');
+            link.href = PDF_URL;
+            link.download = 'shangce.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevPage();
+            if (e.key === 'ArrowRight') nextPage();
+        });
+
+        init();
+    </script>
+</body>
+</html>
