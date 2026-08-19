@@ -3,231 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>在线阅读 - shangce</title>
+    <title>物理教科书-2026 - 在线阅读</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
-            background: #1a1a2e;
-            color: #fff;
+            background: #0d1117;
+            color: #c9d1d9;
             min-height: 100vh;
         }
         .header {
-            background: #16213e;
+            background: #161b22;
             padding: 20px;
             text-align: center;
-            border-bottom: 1px solid #0f3460;
+            border-bottom: 1px solid #30363d;
         }
-        .header h1 { font-size: 24px; margin-bottom: 8px; }
-        .header p { color: #aaa; font-size: 14px; }
-        .controls {
-            background: #16213e;
-            padding: 12px;
+        .header h1 { font-size: 22px; margin-bottom: 6px; color: #f0f6fc; }
+        .header p { color: #8b949e; font-size: 13px; }
+        
+        /* 册别选择 */
+        .volume-bar {
+            background: #161b22;
             display: flex;
             justify-content: center;
-            gap: 12px;
-            align-items: center;
-            border-bottom: 1px solid #0f3460;
-            flex-wrap: wrap;
+            gap: 0;
+            border-bottom: 1px solid #30363d;
         }
-        .controls button {
-            background: #e94560;
-            color: white;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 6px;
+        .volume-btn {
+            padding: 12px 35px;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        .controls button:hover { background: #c73e54; transform: translateY(-1px); }
-        .controls button:disabled { background: #555; cursor: not-allowed; transform: none; }
-        .page-info {
-            color: #ddd;
+            border: none;
+            background: transparent;
+            color: #8b949e;
             font-size: 15px;
-            min-width: 120px;
-            text-align: center;
-            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
         }
-        .zoom-controls { display: flex; gap: 6px; align-items: center; }
-        .zoom-controls span { color: #aaa; font-size: 13px; min-width: 45px; text-align: center; }
-        .download-btn { background: #0f3460 !important; }
-        .download-btn:hover { background: #1a4a7a !important; }
-        #viewer {
+        .volume-btn.active {
+            color: #58a6ff;
+            border-bottom-color: #58a6ff;
+        }
+        .volume-btn:hover { color: #c9d1d9; }
+        .volume-btn .badge {
+            display: inline-block;
+            background: #30363d;
+            color: #8b949e;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+        .volume-btn.active .badge {
+            background: #1f6feb;
+            color: white;
+        }
+        .volume-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .volume-btn:disabled .badge {
+            background: #da3633;
+            color: white;
+        }
+        
+        /* 阅读方式选择 */
+        .mode-bar {
+            background: #0d1117;
             display: flex;
             justify-content: center;
-            padding: 25px 15px;
-            min-height: calc(100vh - 140px);
+            gap: 8px;
+            padding: 12px;
+            border-bottom: 1px solid #21262d;
         }
-        #canvas {
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-            max-width: 100%;
+        .mode-btn {
+            padding: 8px 20px;
+            cursor: pointer;
+            border: 1px solid #30363d;
+            background: #161b22;
+            color: #8b949e;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .mode-btn.active {
+            background: #1f6feb;
+            color: white;
+            border-color: #1f6feb;
+        }
+        .mode-btn:hover:not(.active) { background: #21262d; }
+        
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 阅读器区域 */
+        #viewer-area {
+            background: #161b22;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            overflow: hidden;
+            height: 80vh;
+            min-height: 500px;
+        }
+        #viewer-area iframe, #viewer-area embed {
+            width: 100%;
+            height: 100%;
+            border: none;
             background: white;
         }
-        .loading {
+        
+        /* 下载区域 */
+        .download-area {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .download-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .download-card .icon { font-size: 64px; margin-bottom: 20px; }
+        .download-card h2 { color: #f0f6fc; margin-bottom: 12px; font-size: 20px; }
+        .download-card p { color: #8b949e; margin-bottom: 25px; font-size: 14px; line-height: 1.6; }
+        .download-card .btn {
+            display: inline-block;
+            background: #238636;
+            color: white;
+            text-decoration: none;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .download-card .btn:hover { background: #2ea043; transform: translateY(-2px); }
+        .download-card .file-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #30363d;
+            color: #6e7681;
+            font-size: 13px;
+        }
+        
+        .notice {
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 15px;
+            color: #8b949e;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .notice strong { color: #f0f6fc; }
+        .notice a { color: #58a6ff; }
+        
+        .empty-state {
             text-align: center;
             padding: 100px 20px;
-            color: #aaa;
+            color: #8b949e;
         }
-        .loading::before {
-            content: "📖";
-            display: block;
-            font-size: 48px;
-            margin-bottom: 20px;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.1); }
-        }
-        .error {
-            text-align: center;
-            padding: 80px 20px;
-            color: #e94560;
-            max-width: 500px;
-        }
-        .error::before {
-            content: "⚠️";
-            display: block;
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-        .error a {
-            color: #4da6ff;
-            text-decoration: none;
-        }
-        .error a:hover { text-decoration: underline; }
+        .empty-state .icon { font-size: 48px; margin-bottom: 15px; }
+        .empty-state h3 { color: #f0f6fc; margin-bottom: 10px; }
+        
         @media (max-width: 600px) {
-            .controls { gap: 8px; padding: 10px; }
-            .controls button { padding: 6px 12px; font-size: 12px; }
-            .header h1 { font-size: 20px; }
+            .volume-btn { padding: 10px 20px; font-size: 13px; }
+            .download-card { padding: 25px; }
+            #viewer-area { height: 65vh; min-height: 350px; }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    </script>
 </head>
 <body>
     <div class="header">
-        <h1>📚 shangce</h1>
-        <p>在线阅读 · 支持翻页、缩放、下载</p>
+        <h1>📚 物理教科书-2026</h1>
+        <p>在线阅读与下载</p>
     </div>
     
-    <div class="controls">
-        <button onclick="prevPage()" id="prevBtn">← 上一页</button>
-        <span class="page-info">第 <span id="currentPage">-</span> / <span id="totalPages">-</span> 页</span>
-        <button onclick="nextPage()" id="nextBtn">下一页 →</button>
-        <div class="zoom-controls">
-            <button onclick="zoomOut()">−</button>
-            <span id="zoomLevel">100%</span>
-            <button onclick="zoomIn()">+</button>
+    <!-- 册别选择 -->
+    <div class="volume-bar">
+        <button class="volume-btn active" onclick="switchVolume('shangce')">
+            上册 <span class="badge">已上传</span>
+        </button>
+        <button class="volume-btn" onclick="switchVolume('xiace')" disabled>
+            下册 <span class="badge">待上传</span>
+        </button>
+    </div>
+    
+    <!-- 阅读方式 -->
+    <div class="mode-bar">
+        <button class="mode-btn active" onclick="switchMode('native')">📖 浏览器阅读</button>
+        <button class="mode-btn" onclick="switchMode('gdocs')">🌐 Google 预览</button>
+        <button class="mode-btn" onclick="switchMode('download')">⬇ 下载</button>
+    </div>
+    
+    <div class="content">
+        <!-- 浏览器阅读 -->
+        <div id="mode-native">
+            <div class="notice">
+                <strong>提示：</strong>使用浏览器内置 PDF 阅读器。如果显示异常，请尝试"Google 预览"或下载后阅读。
+            </div>
+            <div id="viewer-area">
+                <embed id="native-embed" src="./shangce.pdf" type="application/pdf">
+            </div>
         </div>
-        <button onclick="downloadPDF()" class="download-btn">⬇ 下载</button>
-    </div>
-    
-    <div id="viewer">
-        <div class="loading">正在加载 PDF，请稍候...</div>
+        
+        <!-- Google 预览 -->
+        <div id="mode-gdocs" style="display:none;">
+            <div class="notice">
+                <strong>提示：</strong>使用 Google Docs 在线预览。需要能访问 Google 服务。XeLaTeX 生成的 PDF 通常在此模式下显示更好。
+            </div>
+            <div id="viewer-area">
+                <iframe id="gdocs-frame" src=""></iframe>
+            </div>
+        </div>
+        
+        <!-- 下载 -->
+        <div id="mode-download" style="display:none;">
+            <div class="download-area">
+                <div class="download-card">
+                    <div class="icon">📄</div>
+                    <h2 id="download-title">物理教科书-2026 上册</h2>
+                    <p id="download-desc">两卷本中文物理教材，涵盖经典力学、电磁学、热力学、相对论等内容。</p>
+                    <a href="./shangce.pdf" class="btn" id="download-link" download="物理教科书-2026-上册.pdf">⬇ 下载 PDF 文件</a>
+                    <div class="file-info" id="download-info">
+                        文件名：shangce.pdf<br>
+                        如果下载失败，请右键点击按钮选择"另存为"
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        const PDF_URL = './shangce.pdf';
+        // 册别配置：现在只有上册，以后添加下册时改这里
+        const volumes = {
+            shangce: {
+                name: '上册',
+                file: 'shangce.pdf',
+                downloadName: '物理教科书-2026-上册.pdf',
+                desc: '涵盖经典力学、电磁学、热力学、相对论等内容。'
+            },
+            xiace: {
+                name: '下册',
+                file: 'xiace.pdf',
+                downloadName: '物理教科书-2026-下册.pdf',
+                desc: '下册内容（待上传）。'
+            }
+        };
         
-        let pdfDoc = null;
-        let currentPage = 1;
-        let totalPages = 0;
-        let scale = 1.3;
-        let canvas, ctx;
-
-        function init() {
-            canvas = document.createElement('canvas');
-            canvas.id = 'canvas';
-            ctx = canvas.getContext('2d');
-            document.getElementById('viewer').innerHTML = '';
-            document.getElementById('viewer').appendChild(canvas);
-            loadPDF();
-        }
-
-        async function loadPDF() {
-            try {
-                pdfDoc = await pdfjsLib.getDocument(PDF_URL).promise;
-                totalPages = pdfDoc.numPages;
-                document.getElementById('totalPages').textContent = totalPages;
-                renderPage(currentPage);
-            } catch (error) {
-                document.getElementById('viewer').innerHTML = 
-                    '<div class="error">无法加载 PDF<br><br>可能的原因：<br>1. 文件名不匹配（当前查找：shangce.pdf）<br>2. PDF 尚未上传到仓库根目录<br>3. 文件名大小写不一致<br><br>请检查仓库中的文件名，确保完全一致。<br><br>错误：' + error.message + '</div>';
-            }
-        }
-
-        async function renderPage(num) {
-            const page = await pdfDoc.getPage(num);
-            const viewport = page.getViewport({ scale: scale });
+        let currentVolume = 'shangce';
+        let currentMode = 'native';
+        
+        function switchVolume(volume) {
+            if (volume === 'xiace') return; // 下册还没上传，不能切换
             
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+            currentVolume = volume;
+            const vol = volumes[volume];
             
-            await page.render({
-                canvasContext: ctx,
-                viewport: viewport
-            }).promise;
+            // 更新册别按钮状态
+            document.querySelectorAll('.volume-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', 
+                    (idx === 0 && volume === 'shangce') || 
+                    (idx === 1 && volume === 'xiace')
+                );
+            });
             
-            document.getElementById('currentPage').textContent = num;
-            updateButtons();
-        }
-
-        function updateButtons() {
-            document.getElementById('prevBtn').disabled = currentPage <= 1;
-            document.getElementById('nextBtn').disabled = currentPage >= totalPages;
-        }
-
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                renderPage(currentPage);
+            // 更新下载信息
+            document.getElementById('download-title').textContent = '物理教科书-2026 ' + vol.name;
+            document.getElementById('download-desc').textContent = vol.desc;
+            document.getElementById('download-link').href = './' + vol.file;
+            document.getElementById('download-link').download = vol.downloadName;
+            document.getElementById('download-info').innerHTML = 
+                '文件名：' + vol.file + '<br>如果下载失败，请右键点击按钮选择"另存为"';
+            
+            // 更新阅读器
+            document.getElementById('native-embed').src = './' + vol.file;
+            if (currentMode === 'gdocs') {
+                loadGdocs();
             }
         }
-
-        function nextPage() {
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderPage(currentPage);
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', 
+                    (mode === 'native' && btn.textContent.includes('浏览器')) ||
+                    (mode === 'gdocs' && btn.textContent.includes('Google')) ||
+                    (mode === 'download' && btn.textContent.includes('下载'))
+                );
+            });
+            
+            // 显示对应区域
+            document.getElementById('mode-native').style.display = mode === 'native' ? 'block' : 'none';
+            document.getElementById('mode-gdocs').style.display = mode === 'gdocs' ? 'block' : 'none';
+            document.getElementById('mode-download').style.display = mode === 'download' ? 'block' : 'none';
+            
+            if (mode === 'gdocs') {
+                loadGdocs();
             }
         }
-
-        function zoomIn() {
-            scale += 0.2;
-            updateZoomDisplay();
-            renderPage(currentPage);
+        
+        function loadGdocs() {
+            const vol = volumes[currentVolume];
+            const baseUrl = window.location.href.replace('/index.html', '').replace(/\/$/, '');
+            const pdfUrl = baseUrl + '/' + vol.file;
+            document.getElementById('gdocs-frame').src = 
+                'https://docs.google.com/gview?embedded=1&url=' + encodeURIComponent(pdfUrl);
         }
-
-        function zoomOut() {
-            if (scale > 0.4) {
-                scale -= 0.2;
-                updateZoomDisplay();
-                renderPage(currentPage);
-            }
-        }
-
-        function updateZoomDisplay() {
-            document.getElementById('zoomLevel').textContent = Math.round(scale * 100 / 1.3) + '%';
-        }
-
-        function downloadPDF() {
-            const link = document.createElement('a');
-            link.href = PDF_URL;
-            link.download = 'shangce.pdf';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') prevPage();
-            if (e.key === 'ArrowRight') nextPage();
-        });
-
-        init();
     </script>
 </body>
 </html>
