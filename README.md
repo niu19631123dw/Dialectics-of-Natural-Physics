@@ -1,10 +1,9 @@
-# Dialectics of Natural Physics: Volume I
+# The Fundamental Logic of the Physical World
 
-*A physics textbook that reconstructs classical mechanics, electromagnetism, and thermodynamics through the lens of a materialist philosophy of science.*
+*A textbook on classical mechanics, electrodynamics, and thermodynamics, grounded in the objective laws of the material universe.*
 
-**Status:** Volume I completed / Volume II in progress
+**Status:** Complete / Volume II in progress
 **Book language:** Chinese (Simplified)
-**Typeset:** XeLaTeX
 
 ---
 
@@ -29,15 +28,13 @@
 
 ## Keywords
 
-`Theoretical Physics` `Chinese Physics Textbook` `Analytical Mechanics` `Maxwell's Equations` `Noether's Theorem` `Materialist Philosophy of Science` `Landau Style` `Natural Philosophy`
+`Theoretical Physics` `Fundamental Logic of the Physical World` `Analytical Mechanics` `Maxwell's Equations` `Noether's Theorem` `Landau Style` `Natural Philosophy`
 
 ---
 
 ## About
 
-This book attempts to re-establish the connection between the logical structure of modern physics and the materialist philosophical tradition. 
-
-Starting from the fundamental relationship between matter, space, and time, it progresses through analytical mechanics and electromagnetism, ultimately culminating in Noether's Theorem — which reveals that conservation laws are not mathematical coincidences, but necessary consequences of the objective symmetry of the material universe.
+This book is an attempt to examine the fundamental logic of the physical world from a materialist perspective. It begins with the most basic concepts of matter, space, and time, moves through analytical mechanics and electrodynamics, and culminates in Noether's theorem — a unified principle that reveals how the objective symmetries of nature dictate the conservation laws we observe.
 
 ---
 
