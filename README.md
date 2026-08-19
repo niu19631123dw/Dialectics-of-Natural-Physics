@@ -1,9 +1,10 @@
 # The Fundamental Logic of the Physical World
 
-*A textbook on classical mechanics, electrodynamics, and thermodynamics, grounded in the objective laws of the material universe.*
+*Exploring the universal laws of nature, from classical field theory and Noether's theorem to the quantum realm and the complexity of living systems.*
 
-**Status:** Complete / Volume II in progress
+**Status:** Volume I completed / Volume II in progress
 **Book language:** Chinese (Simplified)
+**Typeset:** XeLaTeX
 
 ---
 
@@ -21,24 +22,29 @@
 
 | Volume | Core Topics | Status | File |
 |--------|-------------|--------|------|
-| **Volume I** | Analytical Mechanics, Electrodynamics, Thermodynamics, Noether's Theorem | ✅ Available | `shangce.pdf` |
+| **Volume I** | Analytical Mechanics, Electrodynamics, Thermodynamics, Statistical Mechanics, Noether's Theorem | ✅ Available | `shangce.pdf` |
 | **Volume II** | Relativity, Quantum Mechanics, Dissipative Structures, Biophysics | ⏳ Coming soon | — |
 
 ---
 
 ## Keywords
 
-`Theoretical Physics` `Fundamental Logic of the Physical World` `Analytical Mechanics` `Maxwell's Equations` `Noether's Theorem` `Landau Style` `Natural Philosophy`
+`Physics` `Theoretical Physics` `Classical Mechanics` `Analytical Mechanics` `Lagrangian Mechanics` `Hamiltonian Mechanics` `Electromagnetism` `Maxwell's Equations` `Electrodynamics` `Wave Theory` `Optics` `Geometric Optics` `Thermodynamics` `Statistical Mechanics` `Statistical Physics` `Noether's Theorem` `Symmetry` `Conservation Laws` `Relativity` `General Relativity` `Quantum Mechanics` `Biophysics` `Dissipative Structures` `Non-equilibrium Thermodynamics` `Complex Systems` `Physics Textbook` `Natural Philosophy` `Materialist Philosophy of Science`
 
 ---
 
 ## About
 
-This book is an attempt to examine the fundamental logic of the physical world from a materialist perspective. It begins with the most basic concepts of matter, space, and time, moves through analytical mechanics and electrodynamics, and culminates in Noether's theorem — a unified principle that reveals how the objective symmetries of nature dictate the conservation laws we observe.
+This book is an attempt to trace the fundamental logic of the physical world from first principles.
+
+It begins with the simplest concepts of matter, motion, and interaction, builds a rigorous framework through analytical mechanics and classical field theory, and culminates in Noether's theorem — revealing that conservation laws are not mathematical accidents, but necessary consequences of the objective symmetries of the universe.
+
+The journey does not stop there. **Volume II** will continue into relativity, quantum mechanics, dissipative structures, and ultimately the physical laws behind the emergence of life.
 
 ---
 
 ## License
 
-This work is shared under **CC BY-NC-SA 4.0**.  
-Free for educational and non-commercial use. Commercial redistribution is strictly prohibited.
+This work is shared under **CC BY-NC-SA 4.0**.
+
+In plain language: you are free to share and copy it for non-commercial educational purposes, as long as you credit the author and share any adaptations under the same license. **Commercial redistribution (such as selling this book or its derivations for profit) is strictly prohibited.**
