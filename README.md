@@ -1,6 +1,6 @@
-# The Fundamental Logic of the Physical World
+# Dialectics of Natural Physics
 
-*Exploring the universal laws of nature, from classical field theory and Noether's theorem to the quantum realm and the complexity of living systems.*
+*Exploring the Dialectics of Natural Physics, from classical field theory and Noether's theorem to the quantum realm and the complexity of living systems.*
 
 **Status:** Volume I completed / Volume II in progress
 **Book language:** Chinese (Simplified)
