@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>物理教科书-2026 - 在线阅读</title>
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -21,7 +26,6 @@
         .header h1 { font-size: 22px; margin-bottom: 6px; color: #f0f6fc; }
         .header p { color: #8b949e; font-size: 13px; }
         
-        /* 册别选择 */
         .volume-bar {
             background: #161b22;
             display: flex;
@@ -67,7 +71,6 @@
             color: white;
         }
         
-        /* 阅读方式选择 */
         .mode-bar {
             background: #0d1117;
             display: flex;
@@ -99,7 +102,7 @@
             margin: 0 auto;
         }
         
-        /* 阅读器区域 */
+        /* PDF.js 阅读器区域 */
         #viewer-area {
             background: #161b22;
             border-radius: 12px;
@@ -107,8 +110,96 @@
             overflow: hidden;
             height: 80vh;
             min-height: 500px;
+            position: relative;
         }
-        #viewer-area iframe, #viewer-area embed {
+        
+        /* 加载状态 */
+        #pdf-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #30363d;
+            border-top-color: #58a6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* 错误状态 */
+        #pdf-error {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 40px;
+            flex-direction: column;
+        }
+        #pdf-error .icon { font-size: 48px; margin-bottom: 15px; }
+        #pdf-error h3 { color: #f0f6fc; margin-bottom: 10px; }
+        #pdf-error p { color: #8b949e; margin-bottom: 8px; line-height: 1.6; }
+        #pdf-error .retry-btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: #1f6feb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #pdf-error .retry-btn:hover { background: #388bfd; }
+        
+        /* PDF.js 渲染画布 */
+        #pdf-canvas-container {
+            display: none;
+            height: 100%;
+            overflow: auto;
+            text-align: center;
+            padding: 20px;
+            background: #0d1117;
+        }
+        #pdf-canvas {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            max-width: 100%;
+        }
+        
+        /* 页面控制栏 */
+        .pdf-controls {
+            display: none;
+            position: sticky;
+            bottom: 0;
+            background: #161b22;
+            border-top: 1px solid #30363d;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .pdf-controls button {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .pdf-controls button:hover { background: #30363d; }
+        .pdf-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pdf-controls .page-info { color: #8b949e; font-size: 13px; min-width: 80px; text-align: center; }
+        .pdf-controls .zoom-controls { display: flex; gap: 5px; margin-left: 10px; }
+        
+        /* Google Docs 预览 */
+        #gdocs-frame {
             width: 100%;
             height: 100%;
             border: none;
@@ -165,19 +256,15 @@
         }
         .notice strong { color: #f0f6fc; }
         .notice a { color: #58a6ff; }
-        
-        .empty-state {
-            text-align: center;
-            padding: 100px 20px;
-            color: #8b949e;
-        }
-        .empty-state .icon { font-size: 48px; margin-bottom: 15px; }
-        .empty-state h3 { color: #f0f6fc; margin-bottom: 10px; }
+        .notice.error { border-color: #da3633; background: rgba(218,54,51,0.1); }
+        .notice.warning { border-color: #d29922; background: rgba(210,153,34,0.1); }
         
         @media (max-width: 600px) {
             .volume-btn { padding: 10px 20px; font-size: 13px; }
             .download-card { padding: 25px; }
             #viewer-area { height: 65vh; min-height: 350px; }
+            .pdf-controls { flex-wrap: wrap; gap: 8px; }
+            .pdf-controls .zoom-controls { margin-left: 0; width: 100%; justify-content: center; margin-top: 5px; }
         }
     </style>
 </head>
@@ -187,7 +274,6 @@
         <p>在线阅读与下载</p>
     </div>
     
-    <!-- 册别选择 -->
     <div class="volume-bar">
         <button class="volume-btn active" onclick="switchVolume('shangce')">
             上册 <span class="badge">已上传</span>
@@ -197,28 +283,51 @@
         </button>
     </div>
     
-    <!-- 阅读方式 -->
     <div class="mode-bar">
-        <button class="mode-btn active" onclick="switchMode('native')">📖 浏览器阅读</button>
+        <button class="mode-btn active" onclick="switchMode('native')">📖 PDF.js 阅读</button>
         <button class="mode-btn" onclick="switchMode('gdocs')">🌐 Google 预览</button>
         <button class="mode-btn" onclick="switchMode('download')">⬇ 下载</button>
     </div>
     
     <div class="content">
-        <!-- 浏览器阅读 -->
+        <!-- PDF.js 阅读 -->
         <div id="mode-native">
             <div class="notice">
-                <strong>提示：</strong>使用浏览器内置 PDF 阅读器。如果显示异常，请尝试"Google 预览"或下载后阅读。
+                <strong>提示：</strong>使用 PDF.js 渲染引擎，支持所有现代浏览器。如果加载缓慢，请尝试下载后阅读。
             </div>
             <div id="viewer-area">
-                <embed id="native-embed" src="./shangce.pdf" type="application/pdf">
+                <div id="pdf-loading">
+                    <div class="spinner"></div>
+                    <span style="color:#8b949e;">正在加载 PDF...</span>
+                </div>
+                <div id="pdf-error">
+                    <div class="icon">❌</div>
+                    <h3>PDF 加载失败</h3>
+                    <p>文件可能已被删除、移动，或网络连接异常。</p>
+                    <p style="font-size:12px;">错误信息：<span id="error-msg">未知错误</span></p>
+                    <button class="retry-btn" onclick="loadPdf()">🔄 重新加载</button>
+                    <button class="retry-btn" onclick="switchMode('download')" style="background:#238636; margin-left:10px;">⬇ 直接下载</button>
+                </div>
+                <div id="pdf-canvas-container">
+                    <canvas id="pdf-canvas"></canvas>
+                    <div class="pdf-controls" id="pdf-controls">
+                        <button onclick="prevPage()" id="btn-prev">◀ 上一页</button>
+                        <span class="page-info"><span id="page-num">1</span> / <span id="page-count">?</span></span>
+                        <button onclick="nextPage()" id="btn-next">下一页 ▶</button>
+                        <div class="zoom-controls">
+                            <button onclick="zoomOut()">−</button>
+                            <span class="page-info"><span id="zoom-level">100</span>%</span>
+                            <button onclick="zoomIn()">+</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
         <!-- Google 预览 -->
         <div id="mode-gdocs" style="display:none;">
-            <div class="notice">
-                <strong>提示：</strong>使用 Google Docs 在线预览。需要能访问 Google 服务。XeLaTeX 生成的 PDF 通常在此模式下显示更好。
+            <div class="notice warning">
+                <strong>⚠️ 注意：</strong>Google Docs 预览需要能访问 Google 服务。国内用户可能无法使用，建议切换至"PDF.js 阅读"模式。
             </div>
             <div id="viewer-area">
                 <iframe id="gdocs-frame" src=""></iframe>
@@ -243,7 +352,7 @@
     </div>
 
     <script>
-        // 册别配置：现在只有上册，以后添加下册时改这里
+        // ==================== 配置区域 ====================
         const volumes = {
             shangce: {
                 name: '上册',
@@ -262,13 +371,20 @@
         let currentVolume = 'shangce';
         let currentMode = 'native';
         
+        // PDF.js 状态
+        let pdfDoc = null;
+        let currentPage = 1;
+        let totalPages = 0;
+        let scale = 1.5;
+        let rendering = false;
+        let pagePending = null;
+        
+        // ==================== 册别切换 ====================
         function switchVolume(volume) {
-            if (volume === 'xiace') return; // 下册还没上传，不能切换
-            
+            if (volume === 'xiace') return;
             currentVolume = volume;
             const vol = volumes[volume];
             
-            // 更新册别按钮状态
             document.querySelectorAll('.volume-btn').forEach((btn, idx) => {
                 btn.classList.toggle('active', 
                     (idx === 0 && volume === 'shangce') || 
@@ -276,7 +392,6 @@
                 );
             });
             
-            // 更新下载信息
             document.getElementById('download-title').textContent = '物理教科书-2026 ' + vol.name;
             document.getElementById('download-desc').textContent = vol.desc;
             document.getElementById('download-link').href = './' + vol.file;
@@ -284,35 +399,141 @@
             document.getElementById('download-info').innerHTML = 
                 '文件名：' + vol.file + '<br>如果下载失败，请右键点击按钮选择"另存为"';
             
-            // 更新阅读器
-            document.getElementById('native-embed').src = './' + vol.file;
-            if (currentMode === 'gdocs') {
+            if (currentMode === 'native') {
+                loadPdf();
+            } else if (currentMode === 'gdocs') {
                 loadGdocs();
             }
         }
         
+        // ==================== 模式切换 ====================
         function switchMode(mode) {
             currentMode = mode;
             
-            // 更新按钮状态
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.classList.toggle('active', 
-                    (mode === 'native' && btn.textContent.includes('浏览器')) ||
+                    (mode === 'native' && btn.textContent.includes('PDF.js')) ||
                     (mode === 'gdocs' && btn.textContent.includes('Google')) ||
                     (mode === 'download' && btn.textContent.includes('下载'))
                 );
             });
             
-            // 显示对应区域
             document.getElementById('mode-native').style.display = mode === 'native' ? 'block' : 'none';
             document.getElementById('mode-gdocs').style.display = mode === 'gdocs' ? 'block' : 'none';
             document.getElementById('mode-download').style.display = mode === 'download' ? 'block' : 'none';
             
-            if (mode === 'gdocs') {
+            if (mode === 'native') {
+                loadPdf();
+            } else if (mode === 'gdocs') {
                 loadGdocs();
             }
         }
         
+        // ==================== PDF.js 加载 ====================
+        function loadPdf() {
+            const vol = volumes[currentVolume];
+            const url = './' + vol.file;
+            
+            // 重置状态
+            document.getElementById('pdf-loading').style.display = 'flex';
+            document.getElementById('pdf-error').style.display = 'none';
+            document.getElementById('pdf-canvas-container').style.display = 'none';
+            document.getElementById('pdf-controls').style.display = 'none';
+            
+            pdfjsLib.getDocument(url).promise
+                .then(function(pdf) {
+                    pdfDoc = pdf;
+                    totalPages = pdf.numPages;
+                    document.getElementById('page-count').textContent = totalPages;
+                    currentPage = 1;
+                    scale = 1.5;
+                    
+                    document.getElementById('pdf-loading').style.display = 'none';
+                    document.getElementById('pdf-canvas-container').style.display = 'block';
+                    document.getElementById('pdf-controls').style.display = 'flex';
+                    
+                    renderPage(currentPage);
+                })
+                .catch(function(error) {
+                    console.error('PDF 加载错误:', error);
+                    document.getElementById('pdf-loading').style.display = 'none';
+                    document.getElementById('pdf-error').style.display = 'flex';
+                    document.getElementById('error-msg').textContent = 
+                        error.message || '无法加载 PDF 文件';
+                });
+        }
+        
+        function renderPage(num) {
+            rendering = true;
+            document.getElementById('page-num').textContent = num;
+            document.getElementById('zoom-level').textContent = Math.round(scale * 100 / 1.5);
+            
+            pdfDoc.getPage(num).then(function(page) {
+                const canvas = document.getElementById('pdf-canvas');
+                const ctx = canvas.getContext('2d');
+                const viewport = page.getViewport({ scale: scale });
+                
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                const renderTask = page.render(renderContext);
+                renderTask.promise.then(function() {
+                    rendering = false;
+                    if (pagePending !== null) {
+                        renderPage(pagePending);
+                        pagePending = null;
+                    }
+                });
+            });
+            
+            document.getElementById('btn-prev').disabled = num <= 1;
+            document.getElementById('btn-next').disabled = num >= totalPages;
+        }
+        
+        function queueRenderPage(num) {
+            if (rendering) {
+                pagePending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+        
+        function prevPage() {
+            if (currentPage <= 1) return;
+            currentPage--;
+            queueRenderPage(currentPage);
+        }
+        
+        function nextPage() {
+            if (currentPage >= totalPages) return;
+            currentPage++;
+            queueRenderPage(currentPage);
+        }
+        
+        function zoomIn() {
+            scale += 0.25;
+            queueRenderPage(currentPage);
+        }
+        
+        function zoomOut() {
+            if (scale <= 0.5) return;
+            scale -= 0.25;
+            queueRenderPage(currentPage);
+        }
+        
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (currentMode !== 'native') return;
+            if (e.key === 'ArrowLeft') prevPage();
+            if (e.key === 'ArrowRight') nextPage();
+        });
+        
+        // ==================== Google Docs 预览 ====================
         function loadGdocs() {
             const vol = volumes[currentVolume];
             const baseUrl = window.location.href.replace('/index.html', '').replace(/\/$/, '');
@@ -320,6 +541,11 @@
             document.getElementById('gdocs-frame').src = 
                 'https://docs.google.com/gview?embedded=1&url=' + encodeURIComponent(pdfUrl);
         }
+        
+        // ==================== 初始化 ====================
+        window.onload = function() {
+            loadPdf();
+        };
     </script>
 </body>
 </html>
