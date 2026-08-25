@@ -10,10 +10,8 @@
 
 ## 📖 Read Online
 
-👉 [Click here to read online](https://niu19631123dw.github.io/physics-textbook-2026/)
+👉 [Click here to read online](https://niu19631123dw.github.io/Dialectics-of-Natural-Physics/)
 
-- Browser-based PDF viewer
-- Google Docs preview (optimized for XeLaTeX-generated PDFs)
 - Full download available
 
 ---
