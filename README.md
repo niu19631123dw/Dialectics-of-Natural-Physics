@@ -1,58 +1,40 @@
 # Dialectics of Natural Physics
 
-*Exploring the Dialectics of Natural Physics, from classical field theory and Noether's theorem to the quantum realm and the complexity of living systems.*
+**A contemporary sequel to Engels' *Dialectics of Nature*.**
 
-**Status:** Volume I completed / Volume II in progress
-**Book language:** Chinese (Simplified)
-**Typeset:** XeLaTeX
+What if physics itself is dialectical?
 
----
+This is not a book that pastes philosophy onto formulas.  
+It asks why the structure of physics is *itself* dialectical —  
+from the initial determinations of matter, space, time, and interaction,  
+to the causal chains of Newtonian mechanics and the symmetry roots of conservation laws;  
+from the unity of opposites between electricity and magnetism in Maxwell's equations,  
+to Noether's theorem revealing the mutual generation of symmetry and conservation;  
+from the grammar Hamiltonian mechanics reserves for quantum theory,  
+to the dialectics of emergence and fluctuation in quantum statistics;  
+all the way to curved spacetime, where time and space cease to be an unchanging container.
 
-## 📖 Read Online
+**Single PDF. Continuously revised. Always up to date.**
 
-👉 [Click here to read online](https://niu19631123dw.github.io/Dialectics-of-Natural-Physics/)
-
-- Full download available
-
----
-
-## Volumes
-
-| Volume | Core Topics | Status | File |
-|--------|-------------|--------|------|
-| **Volume I** | Analytical Mechanics, Electrodynamics, Thermodynamics, Statistical Mechanics, Noether's Theorem | ✅ Available | `shangce.pdf` |
-| **Volume II** | Relativity, Quantum Mechanics, Dissipative Structures, Biophysics | ⏳ Coming soon | — |
+[📖 Read Online](https://niu19631123dw.github.io/Dialectics-of-Natural-Physics/) · [⬇ Download PDF](https://niu19631123dw.github.io/Dialectics-of-Natural-Physics/book.pdf)
 
 ---
 
-## Keywords
+## Overview
 
-`Physics` `Theoretical Physics` `Classical Mechanics` `Analytical Mechanics` `Lagrangian Mechanics` `Hamiltonian Mechanics` `Electromagnetism` `Maxwell's Equations` `Electrodynamics` `Wave Theory` `Optics` `Geometric Optics` `Thermodynamics` `Statistical Mechanics` `Statistical Physics` `Noether's Theorem` `Symmetry` `Conservation Laws` `Relativity` `General Relativity` `Quantum Mechanics` `Biophysics` `Dissipative Structures` `Non-equilibrium Thermodynamics` `Complex Systems` `Physics Textbook` `Natural Philosophy` `Materialist Philosophy of Science`
+- **Mechanics**: Newtonian · Analytical · Hamiltonian
+- **Electromagnetism & Light**: Electrostatics · Magnetostatics · Induction · Maxwell's Equations · Geometrical Optics
+- **Heat & Statistics**: Kinetic Theory · Thermodynamics · Entropy · Classical Statistics
+- **Modern Physics**: Special Relativity · Quantum Mechanics · Quantum Statistics · Gravity & Cosmology
 
 ---
 
-## About
+## Contributing
 
-**Volume I** covers the foundational pillars of classical physics:
+Errata and suggestions → [Issue](../../issues) / [Discussion](../../discussions)
 
-- The concepts of matter, space, time, and interaction
-- Kinematics and Newtonian mechanics
-- Analytical mechanics: Lagrangian and Hamiltonian formalisms
-- Wave theory and geometric optics
-- Electrodynamics and Maxwell's equations
-- Thermodynamics and statistical mechanics
-- Noether's theorem and the relation between symmetry and conservation laws
-
-**Volume II** is planned to continue into:
-
-- Special and general relativity
-- Quantum mechanics
-- Dissipative structures
-- Biophysics and the physical basis of life
 ---
 
 ## License
 
-This work is shared under **CC BY-NC-SA 4.0**.
-
-In plain language: you are free to share and copy it for non-commercial educational purposes, as long as you credit the author and share any adaptations under the same license. **Commercial redistribution (such as selling this book or its derivations for profit) is strictly prohibited.**
+**CC BY-NC-SA 4.0** — free to share and adapt for non-commercial educational use, with attribution and under the same license.
